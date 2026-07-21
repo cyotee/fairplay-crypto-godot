@@ -4,7 +4,7 @@
 |-------|--------|
 | **Product** | **ManaMesh FairPlay for Godot** |
 | **PRD** | [PRD.md](./PRD.md) |
-| **Status** | **Product + spike decisions locked** — Phase 0 bootstrap engineering next |
+| **Status** | **Milestone A core + desktop shipped** — HTML5 blocked pending Emscripten/export templates |
 | **Architecture** | **Rust L0 + GDExtension**; GDScript first-class; C# docs minimal |
 | **Downstream intent** | Liar’s Dice game (separate repo): multi-store + free web MP |
 | **Repo** | [cyotee/fairplay-crypto-godot](https://github.com/cyotee/fairplay-crypto-godot) |
