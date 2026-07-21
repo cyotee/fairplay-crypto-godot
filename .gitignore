@@ -1,0 +1,23 @@
+# Godot
+.godot/
+*.translation
+export_presets.cfg
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build artifacts (language-specific; refined when core lands)
+target/
+bin/
+obj/
+*.dll
+*.so
+*.dylib
+*.wasm
