@@ -4,12 +4,13 @@
 |-------|--------|
 | **Product** | **ManaMesh FairPlay for Godot** |
 | **Repo** | [cyotee/fairplay-crypto-godot](https://github.com/cyotee/fairplay-crypto-godot) |
-| **Status** | Planning — Phase 0 decisions locked; ready for remaining bootstrap spikes |
+| **Status** | Planning — product + spike decisions locked; remaining work is Phase 0 bootstrap engineering |
 | **License** | **MIT** (entire library, samples, and docs — no commercial split) |
-| **Primary engine** | **Godot 4.4+** (develop on latest stable 4.7.x; Redot best-effort) |
-| **Distribution** | Open source: GitHub, Godot Asset Library (when ready), git submodule / clone |
-| **Architecture** | **Rust crypto core + GDExtension** (primary); GDScript first-class; C# second-class via GDExtension |
-| **API consumers** | **GDScript first-class**; C# optional/secondary (call into GDExtension) |
+| **Primary engine** | **Godot 4.4+** (develop on latest stable 4.7.x; gdext pin; Redot best-effort) |
+| **Distribution** | Open source: GitHub releases (CI binaries), Godot Asset Library, git submodule / clone |
+| **Architecture** | **Rust crypto core + GDExtension**; GDScript first-class; C# docs minimal |
+| **API consumers** | **GDScript first-class** (target game is GDScript-only) |
+| **Downstream product intent** | Enable a future **Liar’s Dice** game (separate repo): single + multiplayer; Steam, Itch, GOG, Play, App Store; free **web multiplayer-only** |
 | **Reference stacks** | C#: [cyotee/fairplay-crypto](https://github.com/cyotee/fairplay-crypto); TS: `@manamesh/boardgameio-crypto` |
 | **Monorepo path** | `packages/fairplay-crypto-godot` submodule of [manamesh-games](https://github.com/cyotee/manamesh-games) |
 | **Implementation plan** | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) |
@@ -37,37 +38,41 @@ Decisions #1–15 are product fundamentals. #16–30 supersede earlier C#-primar
 | 12 | **Marketplace positioning** | P2P secret-security / fair-play crypto for any genre. Not gambling; not cryptocurrency. |
 | 13 | **Branding** | **ManaMesh FairPlay for Godot**. Addon: `addons/manamesh_fairplay/`. Avoid “boardgame.io” in listing. |
 | 14 | **Workflow** | Work in this submodule; bump pointer in manamesh-games. |
-| 15 | **Export targets (Milestone A)** | **Editor + desktop + HTML5** required. **Mobile post-publish.** |
+| 15 | **Export targets (Milestone A)** | **Editor + desktop + HTML5** required. **HTML5 is a hard gate** (free web multiplayer for downstream game). |
 | 16 | **Primary technical backend** | **Rust crypto core + Godot 4 GDExtension** (full pivot from C# core). |
-| 17 | **Why not C# primary** | Official Godot 4 docs: **C# projects cannot export to web**. HTML5 is required for A; GDExtension WASM side modules can. See [docs/research/platform-constraints.md](./docs/research/platform-constraints.md). |
-| 18 | **Milestone B bar** | **Lean B:** P0/P1 only + docs + Asset Library packaging. No advanced-module gate. |
+| 17 | **Why not C# primary** | Official Godot 4 docs: **C# projects cannot export to web**. See [docs/research/platform-constraints.md](./docs/research/platform-constraints.md). |
+| 18 | **Milestone B bar** | **Lean B:** P0/P1 + docs + Asset Library packaging. No advanced-module gate. |
 | 19 | **Algorithm parity** | Behavioral sibling; optional golden vectors only. |
-| 20 | **Netcode in A** | Simulator + **networked mental_poker** MultiplayerAPI sample (not a separate fourth demo game). |
-| 21 | **Godot version** | Develop on **latest stable 4.7.x**; **minimum Godot 4.4+**. |
-| 22 | **Secp256k1** | **Rust** `libsecp256k1` / `rustcrypto` / maintained Rust secp256k1 crate (Phase 0 picks exact crate). |
-| 23 | **Addon install** | Standard Godot addon + prebuilt/native GDExtension binaries for supported platforms; **no .NET requirement** for GDScript users. |
-| 24 | **C# consumers** | Documented second-class path: call extension from C# when needed; **no dual crypto implementation**. |
-| 25 | **Mobile** | **Out of Milestone A**; post-publish (Android/iOS GDExtension build matrix later). |
-| 26 | **HTML5** | **In Milestone A** via GDExtension web (Emscripten side module). Phase 0 must prove web load path. |
-| 27 | **Tests** | **Rust `cargo test`** for L0; optional golden vectors; Godot sample smoke. (No xUnit C# core.) |
-| 28 | **Naming** | Crate/package working name under `manamesh_fairplay` / `manamesh-fairplay`; listing **ManaMesh FairPlay for Godot**. |
-| 29 | **Facade shape** | GDExtension classes (Rust) + **thin GDScript wrappers** for ergonomics; no crypto math in GDScript. |
-| 30 | **Superseded** | Prior “C# core + GDScript facade”, “dual API day one”, “all platforms including mobile for A”, and “NBitcoin/Secp256k1.Net” decisions are **void**. |
+| 20 | **Netcode in A** | Simulator + **networked** MultiplayerAPI sample path. |
+| 21 | **Godot version** | Develop on **latest stable 4.7.x**; **minimum Godot 4.4+**; **pin gdext** to latest stable supporting that range. |
+| 22 | **Secp256k1** | **bitcoin-core `secp256k1` Rust crate** (libsecp256k1 bindings). |
+| 23 | **Addon install** | Addon + **CI-built prebuilt binaries** per platform in GitHub releases; source build docs optional. **No .NET** for GDScript users. |
+| 24 | **C# consumers** | **Minimal docs only** — target game is GDScript-only; no dual crypto core. |
+| 25 | **Mobile** | **Milestone A2** immediately after A (Android + iOS GDExtension) — required before library is “game-ready” for Play/App Store, not a soft post-publish maybe. |
+| 26 | **HTML5** | **Hard gate for A** via GDExtension web side module. |
+| 27 | **Tests** | **Rust `cargo test`** for L0; optional golden vectors; Godot sample smoke. |
+| 28 | **Naming** | `addons/manamesh_fairplay/`; crates `manamesh_fairplay_core` / `manamesh_fairplay_godot` (working); listing **ManaMesh FairPlay for Godot**. |
+| 29 | **Facade shape** | GDExtension classes + thin GDScript wrappers; no crypto math in GDScript. |
+| 30 | **Downstream game** | Future **Liar’s Dice** (separate repo): single + multiplayer; Steam, Itch, GOG, Android Play, Apple App Store; free web multiplayer-only. Game design starts after library is usable. |
+| 31 | **Game vs library repos** | **Library stays this repo**; game is a **separate repo** consuming the addon. |
+| 32 | **Feature priority for Liar’s Dice** | Prioritize **commit–reveal for dice / hidden values + open/verify** (and supporting hash/key material). Full SRA mental-poker remains in scope as general library capability but is not the first game-driven sample focus. |
+| 33 | **Superseded** | C# core primary; dual day-one C# API; NBitcoin primary; “mobile only post-publish with no A2”; pure mental-poker-first sample emphasis without commit–reveal dice priority. |
 
-### Two different “done” bars
+### Done bars
 
 | Bar | Meaning |
 |-----|---------|
-| **Milestone A** | Rust L0 (P0/P1) + `cargo test` + GDExtension addon + GDScript samples + simulator + networked mental-poker MultiplayerAPI sample + **export smoke: Editor, desktop, HTML5**. Mobile not required. |
-| **Milestone B (lean)** | A polished for Asset Library: docs, threat model, notices, listing. No advanced crypto modules required. |
+| **Milestone A** | Rust L0 (P0/P1) + tests + GDExtension + GDScript samples (commit–reveal dice emphasis + general primitives) + simulator + MultiplayerAPI sample + **Editor + desktop + HTML5** smoke. |
+| **Milestone A2 (game-ready mobile)** | Android + iOS GDExtension binaries + smoke; required before calling library ready for Play/App Store game work. |
+| **Milestone B (lean public library)** | A (+ preferably A2) polished for Asset Library: docs, notices, listing. |
 
 ---
 
 ## 1. Problem
 
-Competitive multiplayer games need **provably fair** dealing, hidden placement, and cooperative reveal without a trusted dealer.
+Competitive multiplayer games need **provably fair** hidden values and cooperative reveal without a trusted dealer (e.g. dice faces in **Liar’s Dice**, cards, board placement).
 
-ManaMesh has TS (`boardgameio-crypto`) and C#/Unity (`fairplay-crypto`) stacks. **Godot** needs a first-class MIT package. Research showed Godot 4 **C# cannot target HTML5**, so a C#-primary core would permanently exclude web — unacceptable given the product’s web demo / itch-style distribution goals. **Rust GDExtension** is the path that keeps GDScript ergonomics **and** web export.
+ManaMesh has TS and C#/Unity stacks. **Godot** needs a first-class MIT package that can ship on **desktop stores, mobile stores, and free web multiplayer**. Research showed Godot 4 **C# cannot target HTML5**, so **Rust GDExtension** is required for a single crypto stack across desktop + web (mobile via native GDExtension in A2).
 
 ---
 
@@ -114,7 +119,7 @@ Ship **ManaMesh FairPlay for Godot**:
 |----------|-----------|
 | C# as primary crypto core | Blocks HTML5 in Godot 4 |
 | Separate dual C# crypto reimplementation | Maintenance; C# uses GDExtension |
-| Mobile export gate for A | Deferred post-publish |
+| Mobile export gate for A | Mobile is **A2** (right after A), not part of A hard gate |
 | Wire parity with TS/C# siblings | Behavioral sibling only |
 | Advanced modules as B gate | Lean B |
 | Godot 3 | Godot 4.4+ only |
@@ -137,9 +142,10 @@ Ship **ManaMesh FairPlay for Godot**:
 
 | Sample | Notes |
 |--------|--------|
-| mental_poker_loop | Offline simulator; **also** MultiplayerAPI networked variant |
-| poker_shaped | Hold’em-shaped sequence, not full rules |
-| merkle_battleship | Commit / challenge / open |
+| **dice_commit_reveal** (priority) | Commit hidden dice / values → challenge/open/verify — Liar’s Dice–shaped, still game-agnostic types |
+| mental_poker_loop | Full SRA loop offline; optional MultiplayerAPI variant |
+| merkle_battleship | Commit / challenge / open board-style |
+| MultiplayerAPI path | Prefer networking the **dice commit–reveal** or mental-poker sample |
 
 ### 5.3 Layering
 
@@ -202,14 +208,15 @@ Sources: Godot C# platform docs; exporting-for-web docs; godot-rust book export-
 | Shared runtime | None |
 | Optional vectors | Allowed as test fixtures |
 
-### Module map (A)
+### Module map (A / A2)
 
 | Phase | Modules |
 |-------|---------|
-| P0 | Secp helpers, hash, keychain, SRA, deck helpers |
-| P1 | Commitments, shuffle commit–reveal, Merkle, wire DTOs, simulator |
-| A extras | GDExtension, GDScript API, samples, MultiplayerAPI mental_poker, desktop+HTML5 smoke |
-| Post-B | Mobile binaries, advanced crypto, C# convenience docs |
+| P0 | Secp helpers, hash, **commitments / commit–reveal** (dice-friendly), keychain |
+| P1 | SRA, shuffle commit–reveal, Merkle, wire DTOs, simulator |
+| A extras | GDExtension, GDScript API, **dice_commit_reveal** sample + others, MultiplayerAPI, desktop+HTML5 |
+| A2 | Android + iOS GDExtension binaries + smoke |
+| Post-B | Advanced crypto optional; separate Liar’s Dice game repo |
 
 ---
 
@@ -219,20 +226,21 @@ Sources: Godot C# platform docs; exporting-for-web docs; godot-rust book export-
 |----------|--------|----------|
 | 1 | Godot **4.4+** (dev on **4.7.x**) | Required |
 | 2 | Editor + desktop | Required smoke |
-| 3 | HTML5 + GDExtension | Required smoke |
-| 4 | Mobile | Post-publish |
+| 3 | HTML5 + GDExtension | **Hard gate** for A (free web MP) |
+| 4 | Mobile (Android + iOS) | **Milestone A2** (game-ready for stores) |
 | 5 | Redot | Best-effort |
 
 ---
 
 ## 9. Phases (see IMPLEMENTATION_PLAN for detail)
 
-0. Spikes: Rust toolchain, godot-rust, desktop+web GDExtension load, secp crate choice, scaffold  
-1. Rust P0 + tests  
-2. Rust P1 + simulator + threat model  
-3. Addon + samples + MultiplayerAPI + platform smoke → **Milestone A**  
-4. Lean public publish → **Milestone B**  
-5. Post-publish: mobile, advanced modules, polish  
+0. Bootstrap: toolchain + gdext pin, hello desktop/HTML5, secp256k1 crate, scaffold, CI binaries  
+1. Rust P0 (commit–reveal foundations priority) + tests  
+2. Rust P1 (SRA, shuffle, Merkle, simulator) + threat model  
+3. Addon + samples + MultiplayerAPI + desktop/HTML5 → **Milestone A**  
+4. Android + iOS GDExtension → **Milestone A2** (game-ready for mobile stores)  
+5. Lean public library publish → **Milestone B**  
+6. Separate Liar’s Dice game repo; advanced crypto optional  
 
 ---
 
@@ -241,9 +249,11 @@ Sources: Godot C# platform docs; exporting-for-web docs; godot-rust book export-
 | Metric | Target |
 |--------|--------|
 | L0 | `cargo test` green |
-| Shuffle | Anti-cheat suite green |
-| Samples | Three GDScript samples + networked mental_poker |
-| Platforms | Editor + desktop + HTML5 documented smoke |
+| Commit–reveal | Dice/hidden-value commit + open/verify green |
+| Shuffle | Anti-cheat suite green (when P1 lands) |
+| Samples | dice_commit_reveal + general samples; networked MultiplayerAPI path |
+| Platforms A | Editor + desktop + HTML5 smoke |
+| Platforms A2 | Android + iOS smoke |
 | Install | Clean Godot 4.4+ project ≤ 15 minutes (no .NET) |
 | B | Asset Library package; no ZK overclaims |
 
@@ -279,12 +289,12 @@ fairplay-crypto-godot/
 
 ---
 
-## 14. Open items (implementation, not product direction)
+## 14. Open items (engineering only)
 
-1. Exact Rust secp256k1 crate (`secp256k1`, `k256`, etc.) after Phase 0 bake-off  
-2. godot-rust (gdext) version pin vs Godot 4.4–4.7  
-3. CI binary artifact layout for desktop + web  
-4. Whether C# sample stubs ship in A or docs-only  
+1. Exact gdext crate version pin (latest stable supporting 4.4–4.7) recorded in `docs/research/toolchain.md`  
+2. Hello GDExtension desktop + HTML5 proof  
+3. CI workflow artifact layout for desktop + web (+ A2 mobile later)  
+4. Optional golden vector set for commit–reveal dice fixtures  
 
 ---
 
@@ -306,3 +316,4 @@ fairplay-crypto-godot/
 | 2026-07-20 | Initial Godot MIT PRD |
 | 2026-07-20 | Q&A: C# core + facade, dual API, lean B, all platforms |
 | 2026-07-20 | Research + Q&A pivot: **Rust GDExtension primary**; HTML5 in A; mobile post-publish; GDScript first-class; C# second-class; Godot 4.4+; networked mental_poker sample |
+| 2026-07-20 | Downstream goal: Liar’s Dice multi-store + free web MP; A2 mobile; separate game repo; commit–reveal dice priority; secp256k1 crate; CI binaries; GDScript-only game |
