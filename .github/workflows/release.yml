@@ -1,8 +1,9 @@
 name: release-binaries
 
 # Builds the GDExtension for every supported platform on native runners
-# (secp256k1 compiles C, so native toolchains avoid cross-compile pain) and
-# publishes them. Push a tag (v*) to also attach the binaries to a GitHub Release.
+# (secp256k1 compiles C, so native toolchains avoid cross-compile pain),
+# load-verifies each desktop binary in headless Godot, then publishes.
+# Push a tag (v*) to also attach the binaries to a GitHub Release.
 on:
   push:
     tags: ["v*"]
@@ -13,6 +14,7 @@ permissions:
 
 env:
   CRATE: manamesh_fairplay_godot
+  GODOT_VERSION: "4.7.1"
 
 jobs:
   # ---- Windows x86_64 (.dll) and Linux x86_64 (.so) ---------------------------
@@ -91,10 +93,50 @@ jobs:
           name: web-wasm
           path: addons/manamesh_fairplay/bin/*.wasm
 
+  # ---- Headless Godot load-verification of each desktop binary ----------------
+  smoke:
+    needs: [desktop, macos]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: libmanamesh_fairplay_godot.linux.x86_64.so
+          - os: windows-latest
+            artifact: manamesh_fairplay_godot.windows.x86_64.dll
+          - os: macos-14
+            artifact: libmanamesh_fairplay_godot.macos.universal.dylib
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Drop freshly-built binary into addon bin/
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: addons/manamesh_fairplay/bin
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          use-dotnet: false
+      - name: Import + smoke test (FairPlayApi must load and verify)
+        shell: bash
+        run: |
+          # First scan registers the GDExtension (.godot/ is gitignored, so generate it).
+          godot --headless --path . --import || true
+          out="$(godot --headless --path . --script res://scripts/smoke_desktop.gd 2>&1)"
+          echo "$out"
+          echo "$out" | grep -q SMOKE_DESKTOP_OK
+
   # ---- Gather everything, refresh addon bin/, publish on tag -----------------
   package:
-    needs: [desktop, macos, web]
-    if: always()
+    needs: [desktop, macos, web, smoke]
+    # Publish only when the desktop builds AND their Godot load-tests passed.
+    # web is awaited but optional (it is continue-on-error).
+    if: >-
+      always() &&
+      needs.desktop.result == 'success' &&
+      needs.macos.result == 'success' &&
+      needs.smoke.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -105,7 +147,7 @@ jobs:
         run: |
           BIN=addons/manamesh_fairplay/bin
           mkdir -p "$BIN"
-          # Flatten every downloaded artifact into the addon bin dir.
+          # Overlay every downloaded artifact onto the committed binaries.
           find artifacts -type f \( -name '*.dll' -o -name '*.so' -o -name '*.dylib' -o -name '*.wasm' \) \
             -exec cp -f {} "$BIN/" \;
           echo "Assembled binaries:"; ls -la "$BIN"
