@@ -1,0 +1,18 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test core
+        working-directory: rust
+        run: cargo test -p manamesh_fairplay_core
+      - name: cargo build gdextension
+        working-directory: rust
+        run: cargo build -p manamesh_fairplay_godot --release

@@ -1,0 +1,15 @@
+[package]
+name = "manamesh_fairplay_godot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Godot 4 GDExtension bindings for ManaMesh FairPlay"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+manamesh_fairplay_core = { workspace = true }
+godot = { workspace = true }
+hex = { workspace = true }

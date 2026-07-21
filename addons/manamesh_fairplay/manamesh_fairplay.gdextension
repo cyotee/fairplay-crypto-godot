@@ -1,0 +1,14 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = "4.3"
+reloadable = true
+
+[libraries]
+macos.debug = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.x86_64.dylib"
+macos.release = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.x86_64.dylib"
+windows.debug.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.windows.x86_64.dll"
+windows.release.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.windows.x86_64.dll"
+linux.debug.x86_64 = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.linux.x86_64.so"
+linux.release.x86_64 = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.linux.x86_64.so"
+web.debug.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.web.wasm32.wasm"
+web.release.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.web.wasm32.wasm"

@@ -1,0 +1,27 @@
+[workspace]
+resolver = "2"
+members = [
+    "manamesh_fairplay_core",
+    "manamesh_fairplay_godot",
+]
+default-members = ["manamesh_fairplay_core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["ManaMesh"]
+repository = "https://github.com/cyotee/fairplay-crypto-godot"
+
+[workspace.dependencies]
+manamesh_fairplay_core = { path = "manamesh_fairplay_core" }
+secp256k1 = { version = "0.29", features = ["global-context", "rand-std"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+num-bigint = "0.4"
+num-traits = "0.2"
+godot = { version = "0.3.5", features = ["api-4-3"] }

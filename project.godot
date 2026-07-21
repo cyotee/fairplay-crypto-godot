@@ -1,0 +1,16 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="ManaMesh FairPlay Samples"
+run/main_scene="res://samples/dice_commit_reveal/dice_commit_reveal.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[autoload]
+
+; Optional: instantiate FairPlay via script rather than autoload.
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
