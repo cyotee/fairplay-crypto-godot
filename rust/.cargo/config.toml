@@ -1,0 +1,12 @@
+# Base flags for wasm32-unknown-emscripten GDExtension side modules.
+# Threaded builds add -pthread / +atomics via RUSTFLAGS in scripts/build_web.sh
+# (RUSTFLAGS replaces these entirely when set — keep both paths in the shell script).
+
+[target.wasm32-unknown-emscripten]
+rustflags = [
+    "-C", "link-args=-sSIDE_MODULE=2",
+    "-C", "llvm-args=-enable-emscripten-cxx-exceptions=0",
+    "-Z", "default-visibility=hidden",
+    "-Z", "link-native-libraries=no",
+    # Note: -Z emscripten-wasm-eh=false not available on all nightlies; add if link errors mention __cpp_exception
+]

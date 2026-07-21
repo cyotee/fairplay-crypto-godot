@@ -10,5 +10,9 @@ windows.debug.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_god
 windows.release.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.windows.x86_64.dll"
 linux.debug.x86_64 = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.linux.x86_64.so"
 linux.release.x86_64 = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.linux.x86_64.so"
-web.debug.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.web.wasm32.wasm"
-web.release.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.web.wasm32.wasm"
+# Nothreads (default web export with Thread Support off) — godot-rust expects {crate}.wasm
+web.debug.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.wasm"
+web.release.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.wasm"
+# Threads (Thread Support on) — build with BUILD_THREADS=1 scripts/build_web.sh
+web.debug.threads.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.threads.wasm"
+web.release.threads.wasm32 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.threads.wasm"

@@ -6,3 +6,4 @@ rust/target/
 **/*.pdb
 addons/manamesh_fairplay/bin/*.framework
 rust/target/
+export/

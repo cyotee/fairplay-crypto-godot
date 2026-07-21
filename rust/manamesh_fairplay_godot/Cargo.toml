@@ -9,6 +9,11 @@ publish = false
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+default = []
+# Single-threaded web export (Godot 4.3+ "Thread Support" off)
+nothreads = ["godot/experimental-wasm-nothreads"]
+
 [dependencies]
 manamesh_fairplay_core = { workspace = true }
 godot = { workspace = true }

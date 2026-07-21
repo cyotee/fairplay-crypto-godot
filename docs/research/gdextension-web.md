@@ -1,23 +1,39 @@
 # HTML5 / web GDExtension status
 
-## Requirement
+## Status: **built and exported**
 
-Milestone A treats HTML5 as a hard gate for free web multiplayer.
+| Item | Status |
+|------|--------|
+| emcc | 6.0.3 (Homebrew) |
+| Export templates | 4.7.1.stable (includes web_dlink_nothreads_*) |
+| Side-module wasm | `addons/manamesh_fairplay/bin/manamesh_fairplay_godot.wasm` |
+| Web export | `export/web/` with `gdextensionLibs: ["manamesh_fairplay_godot.wasm"]` |
+| Thread mode | **nothreads** (broader hosting; no COOP required for threads) |
 
-## Environment at implementation time
+## Build
 
-- Emscripten (`emcc`) **not installed**
-- Godot export templates directory empty
-- Only Rust target: `x86_64-apple-darwin`
+```bash
+# Requires: emcc on PATH, rustup nightly + rust-src, ~/.cargo/bin before Homebrew cargo
+./scripts/build_web.sh
 
-## Status
+# Export (Godot 4.7.1 + export templates installed)
+godot --headless --path . --export-release "Web" export/web/index.html
+```
 
-Desktop GDExtension loads and runs crypto (see smoke logs).  
-**HTML5 side-module build was not completed** in this environment; capture install/build failure rather than invent success.
+Critical flags:
 
-## How to complete later
+- `-sSIDE_MODULE=2` via `.cargo/config.toml`
+- `CFLAGS=-fPIC` for libsecp256k1-sys under Emscripten side modules
+- `cargo +nightly -Zbuild-std --features nothreads`
+- godot crate features: `experimental-wasm`, `lazy-function-tables`, `experimental-wasm-nothreads` (via feature)
 
-1. Install Emscripten SDK and Godot 4.7 web export templates.
-2. Follow [godot-rust export-web](https://godot-rust.github.io/book/toolchain/export-web.html) for `wasm32-unknown-emscripten` side module (`SIDE_MODULE=2`).
-3. Place WASM under `addons/manamesh_fairplay/bin/` matching `.gdextension` `web.*` keys.
-4. Export project with Extension Support enabled; verify one `commit_die_face` call in browser.
+## Local serve
+
+```bash
+cd export/web && python3 -m http.server 8060
+# open http://127.0.0.1:8060/
+```
+
+## Notes
+
+godot-rust recommends emcc 3.1.74; Homebrew 6.0.3 worked for the side-module link with `-fPIC`.
