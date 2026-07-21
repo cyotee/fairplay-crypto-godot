@@ -13,6 +13,7 @@
 | Doc | Purpose |
 |-----|---------|
 | **[PRD.md](./PRD.md)** | Product requirements (locked decisions included) |
+| **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** | Phased implementation + testing plan (Phase 0 → lean B) |
 | Sibling C# / Unity line | [cyotee/fairplay-crypto](https://github.com/cyotee/fairplay-crypto) |
 | TS / browser reference | `@manamesh/boardgameio-crypto` in [manamesh-games](https://github.com/cyotee/manamesh-games) |
 

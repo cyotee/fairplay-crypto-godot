@@ -13,6 +13,7 @@
 | **Reference stacks** | C#: [cyotee/fairplay-crypto](https://github.com/cyotee/fairplay-crypto) (`ManaMesh.Crypto`); TS: `@manamesh/boardgameio-crypto` in manamesh-games |
 | **Monorepo path** | `packages/fairplay-crypto-godot` submodule of [manamesh-games](https://github.com/cyotee/manamesh-games) |
 | **Last updated** | 2026-07-20 |
+| **Implementation plan** | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) |
 
 ---
 
@@ -435,10 +436,11 @@ fairplay-crypto-godot/
 Implementation may begin when:
 
 - [x] Clarifying requirements captured in this PRD (§0), including Q&A lock (2026-07-20)  
-- [ ] **Implementation plan** written (`IMPLEMENTATION_PLAN.md`) for Phases 0–3 (Milestone A) and Phase 4 (lean B)  
-- [ ] Phase 0 spike plan covers C#↔GDScript facade and export matrix risks  
-- [ ] Package / addon naming proposal included in the implementation plan  
+- [x] **Implementation plan** written ([IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)) for Phases 0–3 (Milestone A) and Phase 4 (lean B), with testing strategy  
+- [x] Phase 0 spike plan covers C#↔GDScript facade and export matrix risks (see plan §5 Phase 0, §8, §12)  
+- [x] Package / addon naming proposal included (`ManaMesh.FairPlay.Core`, `addons/manamesh_fairplay/` — finalize in plan §12)  
 - [ ] Implementation plan accepted by stakeholders  
+- [ ] Phase 0 decision log filled before large core coding
 
 ---
 
@@ -448,3 +450,4 @@ Implementation may begin when:
 |------|--------|
 | 2026-07-20 | Initial PRD: Godot-first MIT library; repo `fairplay-crypto-godot`; submodule under manamesh-games |
 | 2026-07-20 | Lock Q&A requirements: C# core + GDScript facade; dual GDScript/C# APIs; lean B; behavioral sibling; MultiplayerAPI sample in A; ManaMesh FairPlay branding; all-platform exports for A; latest Godot 4.x until spike |
+| 2026-07-20 | Link implementation & testing plan; mark planning acceptance items complete pending stakeholder plan approval |
