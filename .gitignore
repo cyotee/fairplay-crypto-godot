@@ -1,9 +1,8 @@
 .godot/
 *.translation
-export_presets.cfg
 .DS_Store
 rust/target/
 **/*.pdb
 addons/manamesh_fairplay/bin/*.framework
-rust/target/
+# Large local export output (rebuild with build_web.sh + godot --export-release)
 export/
