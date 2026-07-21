@@ -1,0 +1,124 @@
+name: release-binaries
+
+# Builds the GDExtension for every supported platform on native runners
+# (secp256k1 compiles C, so native toolchains avoid cross-compile pain) and
+# publishes them. Push a tag (v*) to also attach the binaries to a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CRATE: manamesh_fairplay_godot
+
+jobs:
+  # ---- Windows x86_64 (.dll) and Linux x86_64 (.so) ---------------------------
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            built: manamesh_fairplay_godot.dll
+            out: manamesh_fairplay_godot.windows.x86_64.dll
+          - os: ubuntu-latest
+            built: libmanamesh_fairplay_godot.so
+            out: libmanamesh_fairplay_godot.linux.x86_64.so
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build GDExtension (release)
+        working-directory: rust
+        run: cargo build -p ${{ env.CRATE }} --release
+      - name: Stage binary
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "rust/target/release/${{ matrix.built }}" "out/${{ matrix.out }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.out }}
+          path: out/${{ matrix.out }}
+
+  # ---- macOS universal (.dylib: arm64 + x86_64) ------------------------------
+  macos:
+    runs-on: macos-14 # Apple Silicon host; cross-builds x86_64 natively
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - name: Build both arches
+        working-directory: rust
+        run: |
+          cargo build -p "$CRATE" --release --target aarch64-apple-darwin
+          cargo build -p "$CRATE" --release --target x86_64-apple-darwin
+      - name: lipo universal + ad-hoc codesign
+        run: |
+          mkdir -p out
+          lipo -create \
+            "rust/target/aarch64-apple-darwin/release/lib${CRATE}.dylib" \
+            "rust/target/x86_64-apple-darwin/release/lib${CRATE}.dylib" \
+            -output "out/lib${CRATE}.macos.universal.dylib"
+          codesign --force -s - "out/lib${CRATE}.macos.universal.dylib"
+          lipo -info "out/lib${CRATE}.macos.universal.dylib"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lib${{ env.CRATE }}.macos.universal.dylib
+          path: out/lib${{ env.CRATE }}.macos.universal.dylib
+
+  # ---- Web (Emscripten side modules: nothreads + threads) --------------------
+  web:
+    runs-on: ubuntu-latest
+    continue-on-error: true # web is version-sensitive; don't block a release on it
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+          targets: wasm32-unknown-emscripten
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+      - name: Build web side modules
+        run: BUILD_THREADS=1 bash scripts/build_web.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-wasm
+          path: addons/manamesh_fairplay/bin/*.wasm
+
+  # ---- Gather everything, refresh addon bin/, publish on tag -----------------
+  package:
+    needs: [desktop, macos, web]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Assemble addon bin/
+        run: |
+          BIN=addons/manamesh_fairplay/bin
+          mkdir -p "$BIN"
+          # Flatten every downloaded artifact into the addon bin dir.
+          find artifacts -type f \( -name '*.dll' -o -name '*.so' -o -name '*.dylib' -o -name '*.wasm' \) \
+            -exec cp -f {} "$BIN/" \;
+          echo "Assembled binaries:"; ls -la "$BIN"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fairplay-addon-bundle
+          path: addons/manamesh_fairplay/
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "ManaMesh FairPlay for Godot ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            addons/manamesh_fairplay/bin/*

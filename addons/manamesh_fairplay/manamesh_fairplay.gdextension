@@ -4,8 +4,8 @@ compatibility_minimum = "4.3"
 reloadable = true
 
 [libraries]
-macos.debug = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.x86_64.dylib"
-macos.release = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.x86_64.dylib"
+macos.debug = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.universal.dylib"
+macos.release = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.macos.universal.dylib"
 windows.debug.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.windows.x86_64.dll"
 windows.release.x86_64 = "res://addons/manamesh_fairplay/bin/manamesh_fairplay_godot.windows.x86_64.dll"
 linux.debug.x86_64 = "res://addons/manamesh_fairplay/bin/libmanamesh_fairplay_godot.linux.x86_64.so"
