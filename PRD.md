@@ -1,13 +1,15 @@
-# PRD — FairPlay Crypto for Godot
+# PRD — ManaMesh FairPlay for Godot
 
 | Field | Value |
 |-------|--------|
-| **Product** | FairPlay Crypto for Godot |
+| **Product** | **ManaMesh FairPlay for Godot** |
 | **Repo** | [cyotee/fairplay-crypto-godot](https://github.com/cyotee/fairplay-crypto-godot) |
 | **Status** | Planning (implementation after PRD acceptance + implementation plan) |
 | **License** | **MIT** (entire library, samples, and docs — no commercial split) |
 | **Primary engine** | **Godot 4** (Redot compatibility as a non-blocking goal) |
 | **Distribution** | Open source: GitHub, Godot Asset Library (when ready), git submodule / clone |
+| **Architecture** | **Hybrid: C# crypto core + GDScript facade** |
+| **API consumers** | **GDScript and C# equally from day one** |
 | **Reference stacks** | C#: [cyotee/fairplay-crypto](https://github.com/cyotee/fairplay-crypto) (`ManaMesh.Crypto`); TS: `@manamesh/boardgameio-crypto` in manamesh-games |
 | **Monorepo path** | `packages/fairplay-crypto-godot` submodule of [manamesh-games](https://github.com/cyotee/manamesh-games) |
 | **Last updated** | 2026-07-20 |
@@ -16,32 +18,40 @@
 
 ## 0. Requirements decisions (locked)
 
-These define the pivot from the Unity-oriented FairPlay line to a **Godot-first MIT library**.
+These supersede earlier defaults where they conflict. Decisions #16–23 were locked in stakeholder Q&A (2026-07-20).
 
 | # | Topic | Decision |
 |---|--------|----------|
 | 1 | **Primary product** | A **Godot 4** fair-play crypto library other developers can use under **MIT**. |
 | 2 | **Licensing** | **MIT for everything** published in this repo (core, Godot addon, samples, docs). No dual open-core / paid engine package in this product. |
-| 3 | **Relationship to fairplay-crypto** | **Sibling product**, not a thin wrapper of the Unity commercial package. Algorithms and policies may share design intent with `ManaMesh.Crypto` and `boardgameio-crypto`; **no required binary/runtime dependency** on the Unity package. Reuse of ideas, tests, and optional golden vectors is encouraged. |
-| 4 | **Relationship to TypeScript** | TS package is **inspiration and behavioral reference**, not a binding API contract. Drift freely for Godot idioms. |
-| 5 | **First milestone** | **Core crypto + automated tests + Godot samples** (local / offline / simulated multiplayer). Full multiplayer demo game is **later**. |
-| 6 | **API design** | Prefer **Godot-native ergonomics** (GDScript-facing API, Godot types at the boundary where helpful, clear docs). Do not force C#/TS shapes 1:1. |
-| 7 | **Core purity** | Crypto core must not depend on a specific netcode stack, lobby, or game rules engine. **Bring-your-own-netcode.** |
+| 3 | **Relationship to fairplay-crypto** | **Behavioral sibling**, not a thin wrapper of the Unity commercial package and **not a runtime dependency**. Reimplement freely for Godot; reuse ideas, algorithm docs, and optional golden vectors. |
+| 4 | **Relationship to TypeScript** | TS package is **inspiration and behavioral reference**, not a binding API or wire contract. Drift freely for Godot idioms. |
+| 5 | **First milestone** | **Core crypto + automated tests + Godot samples** including simulator **and** an official **Godot MultiplayerAPI** sample path. Full production multiplayer game is **later**. |
+| 6 | **API design** | **Both GDScript and C# equally from day one** — dual public surfaces, dual samples/docs where a feature is public. Do not force TS shapes 1:1. |
+| 7 | **Core purity** | Crypto core must not depend on a specific lobby, matchmaking, or game rules engine. **Bring-your-own-netcode** for library consumers; official samples may use MultiplayerAPI without making it a core dependency. |
 | 8 | **Private keys** | **Never** put private keys in shared multiplayer state or network payloads. APIs and samples make the safe path the default. |
-| 9 | **Shuffle proofs** | **In scope and essential** as integrity / anti-fraud signals. Ship commit–reveal first; document the real threat model. True ZK shuffle is a later bar if claimed. |
+| 9 | **Shuffle proofs** | **In scope and essential** as integrity / anti-fraud signals. Ship commit–reveal for A/B public claims; document the real threat model. True ZK shuffle is **post-publish / experimental**, not a B gate. |
 | 10 | **Security assurance** | **No external audit budget.** Extensive tests, threat-model docs, honest claims. |
 | 11 | **Game domain** | Core stays **game-agnostic**. Poker / battleship / deck genre terms live in **samples**, not core public type names. |
 | 12 | **Marketplace positioning** | Multiplayer / P2P cryptography for securing secrets and verifying fairness in **any genre**. Not gambling; not cryptocurrency. Card demos are illustrative only. |
-| 13 | **Branding** | Product name: **FairPlay Crypto for Godot** (repo: `fairplay-crypto-godot`). Optional **ManaMesh** credit in docs as originating project; do **not** require ManaMesh branding for third-party consumers. Avoid “boardgame.io” in public package naming. |
+| 13 | **Branding** | Public name: **ManaMesh FairPlay for Godot**. Repo may remain `fairplay-crypto-godot`. Avoid “boardgame.io” in public package naming. |
 | 14 | **Workflow** | Day-to-day work in this repo (submodule under `manamesh-games`); bump submodule pointer in the parent monorepo when ready. |
-| 15 | **Export targets** | Aim for Godot 4 exports that a pure / GDExtension-friendly design can support: **desktop, mobile, and web (HTML5)** where crypto backend allows. Document any platform gaps honestly. |
+| 15 | **Export targets (Milestone A)** | **All major Godot exports**: Editor, desktop, **mobile**, and **HTML5/web** smoke validation is part of A (not deferred). Document any platform-specific gaps honestly if a target proves infeasible after spike. |
+| 16 | **Primary technical backend** | **Hybrid: C# crypto core + GDScript facade.** Math and protocol live in managed C#; GDScript calls through a thin, documented facade (not a second crypto implementation). |
+| 17 | **Primary API consumers** | **Both GDScript and C# from day one** — Milestone A samples and docs cover both. |
+| 18 | **Milestone B (public publish) bar** | **Lean B:** P0/P1 modules (SRA, keychain, shuffle commit–reveal, Merkle) + solid docs + packaging. Shamir / threshold / Paillier / ZK are **post-publish or experimental**, not required to list on the Asset Library. |
+| 19 | **Algorithm parity** | **Behavioral sibling, reimplement freely.** No hard wire/API parity with C# `ManaMesh.Crypto` or TS. Optional golden vectors for regression only. |
+| 20 | **Netcode in Milestone A** | Core remains BYO. Ship in-process multi-seat simulator **and** at least one **official Godot MultiplayerAPI sample** (high-level multiplayer nodes / RPCs). WebRTC / join-code path is **not** required for A. |
+| 21 | **Godot version policy** | Develop against **latest stable Godot 4.x**; set oldest-supported 4.x after Phase 0 packaging/export spike. |
+| 22 | **C# core coupling** | Godot C# core may **inspire from** sibling `ManaMesh.Crypto` source but is **owned in this repo** (reimplementation / adaptation). Do not require consumers to pull the Unity package or `fairplay-crypto` Unity tree. |
+| 23 | **Addon install** | Consumers install a Godot 4 addon (C# enabled project). Document .NET / Godot C# requirements clearly for GDScript-only users who still need the C# runtime for the facade. |
 
 ### Two different “done” bars
 
 | Bar | Meaning |
 |-----|---------|
-| **Milestone A — First shippable engineering bar** | Crypto core (P0/P1 fair-play modules) + tests + Godot samples (offline / simulated multi-party). Usable from a Godot project via the documented install path. Not necessarily Asset Library listing. |
-| **Milestone B — Public publish bar** | Milestone A **plus** advanced modules required for public claims (Shamir / threshold suite / Paillier and/or ZK as scoped) **plus** Godot packaging polish, docs, sample scenes, and platform validation (desktop + at least a plan for mobile/web). Eligible for Godot Asset Library submission. |
+| **Milestone A — First shippable engineering bar** | C# crypto core (P0/P1) + tests + Godot addon + GDScript **and** C# samples + multi-seat simulator + **MultiplayerAPI sample** + **export smoke on Editor, desktop, mobile, and HTML5**. Not necessarily Asset Library listing. |
+| **Milestone B — Public publish bar** | Milestone A polished for public use: docs, threat model, third-party notices, Asset Library packaging. **No** advanced modules (Shamir/threshold/Paillier/ZK) required. Eligible for Godot Asset Library submission. |
 
 ---
 
@@ -54,21 +64,21 @@ The ManaMesh ecosystem already has:
 - **TypeScript** fair-play crypto for browser / boardgame.io (`boardgameio-crypto`)
 - **C#** open core + Unity packaging path (`fairplay-crypto` / `ManaMesh.Crypto`)
 
-**Godot** studios cannot cleanly consume either as a first-class Godot addon. They need the same *class of capabilities* packaged for Godot 4 under a permissive license other developers will actually adopt.
+**Godot** studios cannot cleanly consume either as a first-class Godot addon. They need the same *class of capabilities* packaged for Godot 4 under a permissive license other developers will actually adopt — with **both GDScript and C#** as first-class entry points.
 
 ---
 
 ## 2. Product vision
 
-Ship an **MIT Godot 4 library** that:
+Ship **ManaMesh FairPlay for Godot** — an **MIT Godot 4 library** that:
 
-1. Provides multi-party fair-play primitives (mental poker / SRA, keychain admission, Merkle, shuffle integrity, and later threshold / HE / ZK modules as published)
-2. Exposes a **clear GDScript-first API** (with optional C# consumption if the architecture supports it)
-3. Stays **engine-integration-thin**: crypto + protocol DTOs + samples; no mandated multiplayer framework
-4. Is **easy to vendor**: clone, submodule, or Asset Library install
+1. Provides multi-party fair-play primitives (mental poker / SRA, keychain admission, Merkle, shuffle integrity)
+2. Implements crypto in a **C# core** with a **GDScript facade** so both language communities are first-class
+3. Stays **engine-integration-thin** in the library: crypto + protocol DTOs; samples show MultiplayerAPI without mandating it
+4. Is **easy to vendor**: clone, submodule, or Asset Library install (C#-enabled Godot project)
 
 **Framing:**  
-**FairPlay Crypto for Godot** — cryptography for securing secrets and verifying integrity among untrusted peers in multiplayer/P2P games.  
+**ManaMesh FairPlay for Godot** — cryptography for securing secrets and verifying integrity among untrusted peers in multiplayer/P2P games.  
 **Not** “boardgame.io for Godot.” **Not** a gambling or cryptocurrency product.
 
 ---
@@ -81,24 +91,26 @@ Ship an **MIT Godot 4 library** that:
 - **Public-key keychain admission** (curve checks, uniqueness policies)  
 - **Private keys stay local** — safe defaults in API and samples  
 - **Merkle commitments** for hidden placement / board-style games  
-- **Shuffle integrity proofs** as a first-class feature (honest threat model)  
-- **Threshold / HE / ZK modules** before Milestone B public claims that need them  
+- **Shuffle integrity proofs** (commit–reveal) as a first-class feature with an honest threat model  
 - **MIT** adoption path for indie and commercial Godot projects alike  
-- Three headline samples: mental-poker loop, poker-shaped flow, Merkle battleship  
+- **Dual language surface**: GDScript facade + C# API, both documented from day one  
+- Headline samples: mental-poker loop, poker-shaped flow, Merkle battleship — each usable from GDScript and C# where practical  
+- At least one sample wired through **Godot MultiplayerAPI**  
 
 ### 3.2 Engineering goals
 
-- **Pure crypto core** free of game rules and netcode frameworks  
-- **Idiomatic Godot** surface (signals, Resources, documented autoload patterns as appropriate) over cloning C#/TS APIs  
-- **Extensive automated tests** as primary assurance  
+- **C# crypto core** free of game rules and free of a hard MultiplayerAPI dependency  
+- **GDScript facade** that does not reimplement crypto math  
+- **Idiomatic Godot** surface (signals, Resources, documented patterns) over cloning TS APIs  
+- **Extensive automated tests** as primary assurance (core tests without full editor where possible)  
 - Prefer designs that do **not** require hand-rolled secp256k1  
-- Document install for Godot 4.x (minimum version chosen in implementation spike)  
-- Samples run with **in-process multi-seat simulation** before real networking demos  
+- Document install for Godot 4.x + .NET / Godot C# support  
+- **Export validation** for desktop, mobile, and HTML5 as part of Milestone A  
 
 ### 3.3 Community / distribution goals
 
 - Publish as a library other Godot developers can use without commercial friction  
-- Godot Asset Library submission at Milestone B  
+- Godot Asset Library submission at Milestone B under **ManaMesh FairPlay for Godot**  
 - Clear README + threat model + algorithm notes so non-cryptographers can integrate safely  
 
 ---
@@ -109,14 +121,18 @@ Ship an **MIT Godot 4 library** that:
 |----------|-----------|
 | Replace `@manamesh/boardgameio-crypto` for web | TS remains browser/ManaMesh web reference |
 | Replace or absorb Unity commercial packaging | Lives in `fairplay-crypto`; this repo is Godot MIT |
-| Bit-identical wire format with TS or C# | Drift allowed; optional golden vectors for regression only |
-| Full multiplayer demo game in Milestone A | Explicitly later |
-| Required dependency on a specific Godot multiplayer stack | BYO netcode (`MultiplayerAPI`, custom WebRTC, etc.) |
+| Bit-identical wire format with TS or C# sibling | Drift allowed; optional golden vectors only |
+| Runtime dependency on `fairplay-crypto` / Unity package | Sibling inspiration only |
+| Full production multiplayer game in Milestone A | Samples + MultiplayerAPI demo only |
+| Required MultiplayerAPI dependency in the crypto core | BYO netcode for library consumers |
+| WebRTC / join-code matchmaking in Milestone A | Explicitly later |
+| Advanced modules (Shamir, threshold, Paillier, ZK) as B gate | Lean B decision |
 | Gambling / cryptocurrency product positioning | Fair-play & secret security for general games |
 | External security audit before launch | No budget; testing + docs instead |
 | Real-money gambling features | Legal / product risk |
 | Putting poker / battleship domain types in the open core | Domain stays in samples |
 | Godot 3 support | Godot 4 only unless a later decision revisits |
+| Pure GDScript crypto core | Rejected; C# core + facade |
 
 ---
 
@@ -126,9 +142,10 @@ Ship an **MIT Godot 4 library** that:
 
 | Persona | Needs |
 |---------|--------|
-| Godot indie / studio | MIT addon, GDScript examples, clear docs, no paid lock-in |
+| Godot GDScript developer | MIT addon, GDScript facade + samples, clear .NET/C# project prerequisites |
+| Godot C# developer | First-class C# API and samples, same crypto guarantees |
 | Protocol-minded developer | Keychain, peels, shuffle integrity, Merkle — not a full game framework |
-| Multiplayer implementer | Transport-agnostic DTOs / message shapes; local simulator for tests |
+| Multiplayer implementer | Transport-agnostic DTOs; simulator + MultiplayerAPI sample as templates |
 | ManaMesh contributor | Side-by-side submodule next to C# and TS references |
 
 ### 5.2 Core use cases (library)
@@ -138,7 +155,7 @@ Ship an **MIT Godot 4 library** that:
 3. Client-side encrypt binding (local sk matches published pk)  
 4. Merkle commit / open  
 5. Shuffle commit → reveal / verify integrity  
-6. (Publish bar) threshold, Paillier, ZK helpers as scoped  
+6. (Post-publish / experimental) threshold, Paillier, ZK helpers  
 
 ### 5.3 Headline samples (Milestone A)
 
@@ -147,61 +164,81 @@ Ship an **MIT Godot 4 library** that:
 | **Full mental-poker loop** | Keychain admit → layered encrypt → shuffle + proof material → deal → cooperative peel / reveal |
 | **Poker-shaped flow** | Same primitives in a Hold’em-*shaped* sequence (not a full rules engine) |
 | **Merkle battleship** | Commit board / placement → challenge / open with Merkle proofs |
+| **MultiplayerAPI path** | At least one of the above (or a thin fourth scene) wired through Godot high-level multiplayer (host/client, RPCs) without private keys on the wire |
 
-Samples are **teaching demos**, not the core product API. Full multiplayer UX (real netcode, matchmaking) remains **out of Milestone A**.
+Samples are **teaching demos**, not the core product API. A production-quality full game remains **out of Milestone A**.
+
+**Language requirement:** For each headline sample, ship **GDScript and C#** entry points (or a single scene with dual script variants) so neither audience is second-class.
 
 ### 5.4 Library layering
 
 | Layer | Area | Allowed | Forbidden |
 |-------|------|---------|-----------|
-| **L0 Core** | Crypto / protocol primitives | key, keychain, ciphertext, layer, peel, commitment, shuffle proof, Merkle tree/proof, policy | Poker ranks, ship grids, Godot scene trees as required deps for math |
-| **L1 Godot integration** | Addon / plugin surface | GDScript/C# bindings, Resources, optional autoload helpers, editor convenience | Reimplementing crypto math twice |
-| **L2 Samples** | `samples/` or `addons/.../examples` | Didactic game terms, demo UI | Leaking domain types into L0 public API |
+| **L0 C# core** | Crypto / protocol primitives | key, keychain, ciphertext, layer, peel, commitment, shuffle proof, Merkle tree/proof, policy | Poker ranks, ship grids, `Godot.*` types as required deps for math |
+| **L1 Godot integration** | Addon: C# glue + **GDScript facade** | Godot nodes/Resources, signals, MultiplayerAPI-friendly DTOs | Reimplementing crypto math in GDScript |
+| **L2 Samples** | `samples/` | Didactic game terms, demo UI, MultiplayerAPI scenes | Leaking domain types into L0 public API |
 
-**Principle:** L0 stays reusable and testable outside a running game tree where practical. L1 is the Godot-facing package other developers install.
+**Principle:** L0 is testable with `dotnet test` (or equivalent) without launching the editor. L1 is what other developers install. L2 teaches usage in both languages.
 
 ---
 
-## 6. Architecture direction (to finalize in implementation plan)
+## 6. Architecture (locked direction)
 
-This PRD **does not lock a single native backend** until a short spike, but it constrains choices.
+### 6.1 Chosen shape: C# core + GDScript facade
 
-### 6.1 Required outcomes
+```
+┌─────────────────────────────────────────────┐
+│  Samples (GDScript + C#)                    │
+│  simulator · MultiplayerAPI demo            │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│  L1 Godot addon                             │
+│  C# Godot glue  ·  GDScript facade scripts  │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│  L0 ManaMesh FairPlay C# core (this repo)   │
+│  SRA · keychain · shuffle · Merkle · …      │
+│  No MultiplayerAPI / no game rules          │
+└─────────────────────────────────────────────┘
+```
 
-1. **GDScript-callable** public API for Milestone A samples (primary Godot audience).  
-2. **Secure, maintained** elliptic-curve / big-integer stack — no hand-rolled secp256k1.  
-3. **Automated tests** runnable in CI without launching the full editor for core math (editor/headless tests for integration as needed).  
-4. **Export story** documented for desktop; mobile/web gaps called out early.  
+### 6.2 Required outcomes
 
-### 6.2 Candidate implementation shapes (pick in Phase 0)
-
-| Option | Pros | Cons |
-|--------|------|------|
-| **A. GDExtension (Rust preferred)** | Strong crypto ecosystem; GDScript-native UX; good performance | Build matrix, export templates, learning curve |
-| **B. Godot C# consuming / porting `ManaMesh.Crypto`** | Fastest algorithm parity with sibling C# repo | C# project setup; GDScript users need a bridge or dual API |
-| **C. Pure GDScript + third-party crypto** | Easiest install | Likely weak/unsafe for production EC crypto; not preferred for core |
-
-**Default recommendation for planning:** **Option A (Rust GDExtension)** for a GDScript-first MIT library, with algorithm parity inspired by C#/TS; **or Option B** if the team prioritizes fastest reuse of the existing C# core and accepts C#-centric packaging. Phase 0 spike must pick one primary path.
+1. **GDScript-callable** facade for all Milestone A public features.  
+2. **C#-callable** API for the same features without going through GDScript.  
+3. **Secure, maintained** elliptic-curve / big-integer stack — no hand-rolled secp256k1.  
+4. **Automated tests** for L0 in CI without the full editor; Godot headless/export smoke for L1/L2.  
+5. **Export story** for desktop, mobile, and HTML5 as part of A (Godot C# / WASM constraints documented).  
 
 ### 6.3 Rules for the crypto core
 
 1. Never put private keys in shared multiplayer state or network payloads — ciphertexts / peels / commitments only  
-2. No hard dependency on a specific multiplayer addon  
+2. No hard dependency on MultiplayerAPI or a third-party netcode addon in L0  
 3. No hand-rolled secp256k1  
 4. Keychain-style admission for public keys  
 5. Client-side bind: local sk matches published pk before encrypt  
 6. Document integrity vs zero-knowledge honestly  
 7. Prefer byte-oriented secrets; hex/base64 only at boundaries  
+8. GDScript facade must not re-encode unsafe crypto; it only marshals to/from the C# core  
 
 ### 6.4 Netcode
 
-**Bring your own.** Ship:
+**Library consumers: bring your own.** Ship:
 
 - Protocol-oriented DTOs / dictionaries (documented fields)  
 - Optional message sink/source interfaces or Godot signals  
-- An **in-process multi-seat simulator** for tests and samples  
+- An **in-process multi-seat simulator** for tests and offline samples  
+- At least one **official MultiplayerAPI sample** showing host/client message flow with fair-play payloads  
 
-No required dependency on a particular lobby, relay, or WebRTC stack.
+No required dependency on a particular lobby, relay, or WebRTC stack for the library itself.
+
+### 6.5 Godot C# / GDScript project implications
+
+- Consumers need a **Godot build with .NET / C# support** even if they only write GDScript against the facade.  
+- Document this upfront in README and Asset Library listing.  
+- Phase 0 spike must validate: GDScript → C# core call path, export sizes, and HTML5 C# constraints for the chosen Godot version.
 
 ---
 
@@ -210,15 +247,15 @@ No required dependency on a particular lobby, relay, or WebRTC stack.
 | Concern | Decision |
 |---------|----------|
 | `boardgameio-crypto` (TS) | Behavioral reference only |
-| `fairplay-crypto` (C# / Unity) | Sibling algorithms and docs; optional vector sharing; **not** a runtime dependency of this Godot package |
-| This repo | Godot 4 MIT product |
+| `fairplay-crypto` (C# / Unity) | Sibling algorithms and docs; optional vector sharing; **not** a runtime dependency |
+| This repo | Godot 4 MIT product; owns its C# core copy/adaptation |
 | Monorepo link | Submodule of `manamesh-games` at `packages/fairplay-crypto-godot` |
-| API parity with C#/TS | **Not required** — idiomatic Godot wins |
-| Shared runtime code | **None required** — reimplementation or intentional shared design docs only |
+| API parity with C#/TS | **Not required** — idiomatic Godot dual API wins |
+| Shared runtime code | **None required** |
 
 ### 7.1 Golden vectors
 
-Optional **test data only** (JSON fixtures) for regression and learning ports. Not shared runtime libraries. Not a production interop guarantee unless a future PRD explicitly adds cross-engine wire compatibility.
+Optional **test data only** (JSON fixtures) for regression and learning ports. Not shared runtime libraries. Not a production interop guarantee.
 
 ### 7.2 Module map
 
@@ -229,10 +266,8 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 | P0 | secp256k1 via maintained library + validation | Foundation |
 | P1 | Commitments + **shuffle proofs** (commit–reveal) | Essential for A; honest threat model |
 | P1 | Merkle, hashing, canonical encoding | Battleship-style examples |
-| A extras | Godot addon packaging + 3 samples + simulator | Milestone A |
-| P2 | Shamir SSS | Before public publish if claimed |
-| P2 | ECDSA, EC ElGamal-style, Feldman DKG, DLEQ | Threshold suite; before publish if claimed |
-| P3 | Paillier / ZK (as designed) | Before publish claims that need them |
+| A extras | Godot addon, GDScript facade, dual-language samples, simulator, MultiplayerAPI sample, **all-platform export smoke** | Milestone A |
+| Post-B (optional) | Shamir, threshold suite, Paillier, ZK | Experimental / later; not B gate |
 
 ---
 
@@ -240,15 +275,16 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 
 | Priority | Target | Approach |
 |----------|--------|----------|
-| 1 | **Godot 4** | Primary addon + samples |
-| 2 | **Redot** (Godot-compatible) | Best-effort; do not block Godot 4 releases |
-| 3 | Cross-check with C#/TS siblings | Docs and optional vectors only |
+| 1 | **Godot 4** (latest stable for development) | Primary addon + samples |
+| 2 | **Export matrix for A** | Editor, desktop, mobile, HTML5 smoke |
+| 3 | **Redot** (Godot-compatible) | Best-effort; do not block Godot 4 releases |
+| 4 | Cross-check with C#/TS siblings | Docs and optional vectors only |
 
-**Godot version floor:** Support a **current stable Godot 4.x**; choose the oldest 4.x still practical in Phase 0 spike (document in README).
+**Godot version floor:** Develop on **latest stable Godot 4.x**; record oldest-supported 4.x after Phase 0 spike (C# + exports + HTML5).
 
-**Platforms (goal):** Editor, desktop exports first; mobile and HTML5 as far as the chosen crypto backend allows. Document limitations (e.g. GDExtension export requirements).
+**Platforms (Milestone A requirement):** Editor, standalone desktop, mobile (Android and/or iOS as practical), and HTML5. If a target is blocked by Godot C#/.NET limitations, spike must either solve it or produce a documented **blocker** for stakeholder re-scope before calling A done.
 
-**Multiplayer:** Milestone A samples use **local / simulated** multi-party flows. Real multiplayer demos later. Docs stay transport-agnostic.
+**Multiplayer:** Simulator for offline teaching; MultiplayerAPI sample for networked teaching. Production netcode remains the integrator’s job.
 
 ---
 
@@ -256,45 +292,44 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 
 ### Phase 0 — Spec & project bootstrap
 
-- Repo layout: core, Godot addon path, samples, docs, tests  
-- Choose primary architecture (GDExtension vs C# vs hybrid) via spike  
+- Repo layout: C# core, Godot addon (C# + GDScript facade), samples, docs, tests  
+- Spike: Godot C# core + GDScript facade call path  
+- Spike: export matrix (desktop, mobile, HTML5) with chosen Godot/.NET versions  
 - Algorithm notes for P0/P1 (may adapt from `fairplay-crypto` docs)  
-- Godot version floor and export constraints  
-- CI plan (core tests at minimum)  
+- CI plan (`dotnet test` for L0; Godot headless where feasible)  
+- Record minimum Godot 4.x and .NET requirements in README  
 
-### Phase 1 — Core P0 + tests
+### Phase 1 — C# core P0 + tests
 
 - SRA, keychain, curve validation, deck / layer helpers  
 - Extensive unit + multi-party scenario tests  
 
-### Phase 2 — Core P1 + shuffle proofs + Merkle
+### Phase 2 — C# core P1 + shuffle proofs + Merkle
 
 - Commitments, shuffle proof API, Merkle  
 - Threat-model doc for shuffle (anti-fraud messaging)  
 
-### Phase 3 — Milestone A: Godot package + samples
+### Phase 3 — Milestone A: Godot package + dual samples + platforms
 
-- Installable Godot 4 addon structure  
-- Three samples: mental-poker loop, poker-shaped, Merkle battleship  
-- Offline / simulated multi-party only  
-- Platform smoke: Editor + at least one desktop export path  
+- Installable Godot 4 addon (`plugin.cfg`, C# assemblies, GDScript facade)  
+- Samples: mental-poker loop, poker-shaped, Merkle battleship — **GDScript + C#**  
+- In-process multi-seat simulator  
+- Official **MultiplayerAPI** sample path  
+- Export smoke: Editor + desktop + mobile + HTML5  
+- Docs: install, key safety, threat model summary  
 
-### Phase 4 — Advanced modules (as required for Milestone B claims)
+### Phase 4 — Milestone B: Public publish (lean)
 
-- Shamir, threshold suite, Paillier, ZK as scoped  
-- Expand tests  
+- Godot Asset Library readiness under **ManaMesh FairPlay for Godot**  
+- Docs polish, licensing notices, security / limitations section  
+- No advanced-module gate  
 
-### Phase 5 — Milestone B: Public publish
+### Phase 5 — Post-publish (optional)
 
-- Godot Asset Library readiness  
-- Docs, licensing notices, security / limitations section  
-- Platform matrix validation as supported  
-
-### Phase 6 — Post-publish
-
-- Full multiplayer demo (optional)  
-- Optional official adapters for popular Godot netcode patterns  
-- Optional cross-engine interop vectors with C#/TS if product value appears  
+- Advanced modules (Shamir, threshold, Paillier, ZK) as experimental packages or later releases  
+- Full multiplayer demo game  
+- WebRTC / join-code demos if product value appears  
+- Optional cross-engine interop vectors with C#/TS  
 
 ---
 
@@ -302,10 +337,12 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 
 | Metric | Target |
 |--------|--------|
-| Milestone A | Core tests green; three samples runnable in Godot Editor without private keys in simulated network payloads |
-| Shuffle proofs | API usable from samples; docs state what is / is not detected |
-| Install | Documented path works on a clean Godot 4 project in under 15 minutes |
-| Milestone B | Advanced modules present as claimed; Asset Library packaging complete; no ZK/HE overclaims |
+| Milestone A core | L0 tests green; no private keys in simulated or MultiplayerAPI sample payloads |
+| Dual language | GDScript and C# samples cover the three headline flows (or explicit dual entry points) |
+| MultiplayerAPI | At least one sample runs host/client (or listen server) with fair-play messages |
+| Platforms | Documented smoke results for Editor, desktop, mobile, HTML5 |
+| Install | Clean Godot 4 C#-enabled project can install and run a sample in under 15 minutes |
+| Milestone B | Asset Library packaging complete; lean feature set only; no ZK/HE overclaims |
 | License clarity | MIT on repo; third-party notices for crypto dependencies |
 
 ---
@@ -318,9 +355,9 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 - Property / fuzz tests where useful  
 - No external audit planned pre-launch  
 
-### 11.2 Shuffle proofs (Milestone A) — commit–reveal
+### 11.2 Shuffle proofs (Milestone A/B public) — commit–reveal
 
-**In scope and required.** First anti-cheat layer for deck order:
+**In scope and required** for public claims:
 
 - Shuffler **commits** to a permutation (hash commitment) before / at shuffle  
 - Deck is shuffled under encryption  
@@ -328,20 +365,12 @@ Optional **test data only** (JSON fixtures) for regression and learning ports. N
 - **Prevents:** changing deck order *after* commitment (bait-and-switch)  
 - **Does not provide:** zero-knowledge that the shuffle is correct without ever revealing the permutation  
 
-**Messaging:** “Shuffle integrity / anti-cheat (commit–reveal)” for A.  
-**True ZK shuffle** is **not** required for Milestone A; include only if Milestone B claims need it.
+**Messaging:** “Shuffle integrity / anti-cheat (commit–reveal).”  
+**True ZK shuffle** is **not** required for A or lean B; do not market it until shipped.
 
-### 11.3 True ZK shuffle (Milestone B, if claimed)
+### 11.3 True ZK shuffle (post-publish, if ever claimed)
 
-A ZK shuffle proof lets a player prove a valid re-encryption / permutation **without revealing the permutation**. Peers verify a proof object.
-
-| | Commit–reveal (A) | ZK shuffle (B) |
-|--|-------------------|----------------|
-| Order leakage | Known after reveal | Need not learn permutation to accept |
-| When fraud is catchable | At reveal time | At shuffle time (invalid proof ⇒ reject) |
-| Cost | Cheap | Heavier engineering |
-
-Do not market “verifiable shuffle without revealing order” until ZK (or equivalent) ships.
+A ZK shuffle proof lets a player prove a valid re-encryption / permutation **without revealing the permutation**. Peers verify a proof object. Heavier engineering; optional later release only.
 
 ---
 
@@ -349,19 +378,20 @@ Do not market “verifiable shuffle without revealing order” until ZK (or equi
 
 | Artifact | Intent |
 |----------|--------|
-| Crypto core | MIT |
-| Godot addon / integration | MIT |
+| C# crypto core | MIT |
+| Godot addon / GDScript facade | MIT |
 | Samples | MIT |
-| Docs / algorithm notes | MIT (or CC0/MIT-equivalent project docs; default MIT with repo) |
+| Docs / algorithm notes | MIT (default with repo) |
 | Third-party crypto deps | Compatible licenses only; ship `THIRD_PARTY_NOTICES` |
 
 **No commercial Asset Store SKU in this repository.** Commercial Unity packaging remains in `fairplay-crypto` if continued separately.
 
+**Asset Library listing name:** ManaMesh FairPlay for Godot  
+**Technical addon folder (working):** `addons/manamesh_fairplay/` (finalize slug in implementation plan if needed)
+
 ---
 
 ## 13. Repository layout (planned)
-
-Exact paths depend on Phase 0 architecture choice; conceptual layout:
 
 ```
 fairplay-crypto-godot/
@@ -373,27 +403,30 @@ fairplay-crypto-godot/
 │   ├── threat-model.md
 │   ├── algorithms/
 │   └── godot-integration.md
-├── core/                   # language-native crypto (e.g. Rust crate or C# lib)
+├── csharp/                 # L0 C# core + unit tests
+│   ├── ManaMesh.FairPlay.Core/   # name TBD in plan
+│   └── ManaMesh.FairPlay.Core.Tests/
 ├── addons/
-│   └── fairplay_crypto/    # Godot 4 addon (plugin.cfg, bindings, scripts)
+│   └── manamesh_fairplay/  # L1 Godot 4 addon (C# + GDScript facade)
 ├── samples/
-│   ├── mental_poker_loop/
+│   ├── mental_poker_loop/  # GDScript + C# entry points
 │   ├── poker_shaped/
-│   └── merkle_battleship/
+│   ├── merkle_battleship/
+│   └── multiplayer_api/    # official MultiplayerAPI path
 ├── tests/
 └── vectors/                # optional fixtures only
 ```
 
 ---
 
-## 14. Open questions
+## 14. Open questions (remaining)
 
-1. **Primary backend:** Rust GDExtension vs Godot C# (port/reuse `ManaMesh.Crypto`) vs hybrid — Phase 0 spike  
-2. **Minimum Godot 4.x version** after spike  
-3. **Public package / addon name** (`fairplay_crypto` vs alternate Asset Library slug)  
-4. **Which advanced modules are mandatory** for Milestone B vs clearly “experimental”  
-5. **ZK suite choice** if B claims true ZK shuffle  
-6. **Whether any wire compatibility** with C#/TS is ever a product goal (default: no)  
+1. **Exact C# package / assembly names** (`ManaMesh.FairPlay.Core` vs alternate)  
+2. **Addon slug** finalization (`manamesh_fairplay` vs Asset Library constraints)  
+3. **Oldest Godot 4.x + .NET version** after Phase 0 export spike  
+4. **HTML5 / mobile feasibility** with Godot C# for this crypto stack — confirm or re-scope if blocked  
+5. **Whether MultiplayerAPI sample is a fourth sample or one of the three headline flows networked**  
+6. **secp256k1 / crypto NuGet choice** for Godot C# (align with or diverge from sibling NBitcoin.Secp256k1 usage)  
 
 ---
 
@@ -401,10 +434,10 @@ fairplay-crypto-godot/
 
 Implementation may begin when:
 
-- [x] Clarifying requirements captured in this PRD (§0)  
-- [ ] **Implementation plan** written (`IMPLEMENTATION_PLAN.md`) for Phases 0–3 (Milestone A), with Phases 4–5 as publish gate  
-- [ ] Phase 0 architecture spike decision recorded (GDExtension vs C# vs hybrid)  
-- [ ] Package / addon naming finalized  
+- [x] Clarifying requirements captured in this PRD (§0), including Q&A lock (2026-07-20)  
+- [ ] **Implementation plan** written (`IMPLEMENTATION_PLAN.md`) for Phases 0–3 (Milestone A) and Phase 4 (lean B)  
+- [ ] Phase 0 spike plan covers C#↔GDScript facade and export matrix risks  
+- [ ] Package / addon naming proposal included in the implementation plan  
 - [ ] Implementation plan accepted by stakeholders  
 
 ---
@@ -413,4 +446,5 @@ Implementation may begin when:
 
 | Date | Change |
 |------|--------|
-| 2026-07-20 | Initial PRD: Godot-first MIT library pivot; new repo `fairplay-crypto-godot`; submodule under manamesh-games |
+| 2026-07-20 | Initial PRD: Godot-first MIT library; repo `fairplay-crypto-godot`; submodule under manamesh-games |
+| 2026-07-20 | Lock Q&A requirements: C# core + GDScript facade; dual GDScript/C# APIs; lean B; behavioral sibling; MultiplayerAPI sample in A; ManaMesh FairPlay branding; all-platform exports for A; latest Godot 4.x until spike |
