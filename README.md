@@ -1,10 +1,10 @@
 # ManaMesh FairPlay for Godot
 
-**MIT** fair-play cryptography for **Godot 4**: commit–reveal (dice / hidden values), public-key keychain, SRA mental poker, shuffle integrity (commit–reveal), Merkle proofs.
+**MIT** fair-play cryptography for **Godot 4**: commit–reveal (dice / hidden boards), public-key keychain, SRA mental poker, shuffle integrity, Merkle selective-open helpers (e.g. Battleship-style grids).
 
-**Architecture:** Rust crypto core + **GDExtension** · **GDScript-first** · no .NET required.
+**Architecture:** Rust cryptography core + **GDExtension** · **GDScript-first** · no .NET required.
 
-**Not** a gambling or cryptocurrency product.
+Built for **multiplayer game fairness**, not real-money gambling.
 
 | | |
 |--|--|
@@ -40,7 +40,7 @@ cargo test -p manamesh_fairplay_core
 
 | Path | Role |
 |------|------|
-| `rust/manamesh_fairplay_core` | Pure crypto (`cargo test`) |
+| `rust/manamesh_fairplay_core` | Pure cryptography core (`cargo test`) |
 | `rust/manamesh_fairplay_godot` | GDExtension bindings |
 | `addons/manamesh_fairplay` | Godot addon + prebuilt binaries |
 | `samples/dice_commit_reveal` | Offline commit–reveal sample |

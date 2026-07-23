@@ -1,6 +1,6 @@
 # Commit–reveal
 
-Commit–reveal is the **first-class** fairness primitive for hidden values such as dice hands.
+Commit–reveal is the **first-class** fairness primitive for hidden values such as dice hands. Related patterns for **boards** (commit once, open only some cells) use [Merkle](api.md#merkle-board-style-commit-selective-open) roots and proofs — e.g. Battleship-style ship placement.
 
 ## Scheme
 

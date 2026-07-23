@@ -23,9 +23,9 @@ Release assets and `addons/manamesh_fairplay/bin/`:
 
 Mapped in `addons/manamesh_fairplay/manamesh_fairplay.gdextension`.
 
-## Why not C# as the crypto core?
+## Why not C# as the core?
 
-Godot 4 **cannot export C# projects to HTML5**. This library uses **Rust + GDExtension** so the same crypto stack can target desktop and web for free multiplayer builds. C# games can still call the GDExtension from GDScript or via the same native class if desired; there is no separate C# crypto core.
+Godot 4 **cannot export C# projects to HTML5**. This library uses **Rust + GDExtension** so the same fairness stack can target desktop and web for free multiplayer builds. C# games can still call the GDExtension from GDScript or via the same native class if desired; there is no separate C# reimplementation.
 
 ## Godot version floor
 

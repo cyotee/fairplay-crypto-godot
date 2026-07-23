@@ -39,7 +39,7 @@ Layered commutative encryption on secp256k1. Integrity of peels depends on corre
 | Assumption | If violated |
 |------------|-------------|
 | Peers run unmodified clients | A modified client can still only open what it committed to (for commit–reveal); other cheating is game-rule dependent |
-| Transport authenticates peers | Identity spoofing is out of scope for the crypto core |
+| Transport authenticates peers | Identity spoofing is out of scope for this library |
 | Hosts do not need to hold player private keys | Do not centralize sk material for “convenience” |
 
 ## Reporting issues

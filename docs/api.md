@@ -1,6 +1,6 @@
 # GDScript API
 
-Crypto math lives in Rust (`manamesh_fairplay_core`). GDScript only calls **`FairPlayApi`** (GDExtension class) or the thin **`FairPlay`** facade.
+Cryptographic math lives in Rust (`manamesh_fairplay_core`). GDScript only calls **`FairPlayApi`** (GDExtension class) or the thin **`FairPlay`** facade.
 
 !!! tip "Private keys"
     Methods that take `private_key_hex` keep secrets **local**. Never put private keys in MultiplayerAPI RPCs, shared game state, or public wire JSON. See [netcode](netcode.md).
@@ -104,17 +104,30 @@ Empty dictionary on error (invalid key / bad ciphertext). Prefer checking for em
 
 ---
 
-## Merkle
+## Merkle (board-style commit / selective open)
+
+Merkle trees let a player **commit to a full hidden board** (or grid of cells) with a single public root, then later **open only the challenged cells** with inclusion proofs — the classic pattern for Battleship-style placement fairness, fog-of-war grids, and other partial-reveal boards.
 
 ### `merkle_root_utf8(leaves: PackedStringArray) -> String`
 
-SHA-256 Merkle root (hex) over leaves derived from UTF-8 strings.
+SHA-256 Merkle root (hex) over leaves derived from UTF-8 strings (e.g. one leaf per cell: `"3,5:ship"` / `"3,5:empty"`).
+
+```gdscript
+var api = ClassDB.instantiate("FairPlayApi")
+# Example: commit to every cell of a small board, publish only the root
+var leaves := PackedStringArray(["0,0:empty", "0,1:ship", "1,0:empty", "1,1:empty"])
+var root: String = api.merkle_root_utf8(leaves)
+# Peers store root; on a hit/challenge you open the cell + proof (prove helpers in Rust core)
+```
+
+!!! note "Proof helpers"
+    Full `merkle_prove` / `merkle_verify` live in the Rust core and unit tests today; only root construction is on `FairPlayApi` in v0.1. Open an issue if you need prove/verify bound to GDScript for a Battleship-style game.
 
 ---
 
 ## Facade (`FairPlay`)
 
-`addons/manamesh_fairplay/facade/fair_play.gd` forwards to `FairPlayApi` with the same method names. No crypto math in GDScript.
+`addons/manamesh_fairplay/facade/fair_play.gd` forwards to `FairPlayApi` with the same method names. No cryptographic math in GDScript.
 
 ---
 

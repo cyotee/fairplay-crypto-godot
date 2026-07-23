@@ -1,5 +1,5 @@
 site_name: ManaMesh FairPlay for Godot
-site_description: MIT fair-play cryptography for Godot 4 — commit–reveal, mental poker, Merkle, shuffle integrity
+site_description: MIT fair-play cryptography for Godot 4 — commit–reveal (dice, Battleship-style boards), mental poker, Merkle selective open, shuffle integrity
 site_url: https://cyotee.github.io/fairplay-crypto-godot/
 repo_url: https://github.com/cyotee/fairplay-crypto-godot
 repo_name: cyotee/fairplay-crypto-godot

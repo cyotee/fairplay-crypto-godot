@@ -1,4 +1,4 @@
-//! secp256k1 helpers via the bitcoin-core `secp256k1` Rust crate.
+//! secp256k1 helpers via the maintained `secp256k1` Rust crate (libsecp256k1).
 
 use num_bigint::BigUint;
 use num_traits::Zero;

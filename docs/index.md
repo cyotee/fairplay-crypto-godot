@@ -1,8 +1,8 @@
 # ManaMesh FairPlay for Godot
 
-**MIT** fair-play cryptography for **Godot 4**: commit–reveal (dice / hidden values), public-key keychain, SRA mental poker, shuffle integrity, and Merkle proofs.
+**MIT** fair-play cryptography for **Godot 4**: commit–reveal (dice / hidden boards), public-key keychain, SRA mental poker, shuffle integrity, and Merkle selective-open helpers (Battleship-style grids and similar).
 
-**Architecture:** Rust crypto core + **GDExtension** · **GDScript-first** · no .NET required.
+**Architecture:** Rust cryptography core + **GDExtension** · **GDScript-first** · no .NET required.
 
 !!! warning "Early release (v0.1)"
     This is a **technical preview**. Desktop binaries and core tests are solid.
@@ -16,8 +16,8 @@
 | Commit–reveal for hidden values (Liar’s Dice–shaped) | A full multiplayer game |
 | SRA mental-poker encrypt / peel on secp256k1 | Matchmaking, lobby, or required netcode |
 | Shuffle commit–reveal integrity helpers | Zero-knowledge shuffle proofs (post-preview) |
-| Merkle root / proof helpers | Gambling or cryptocurrency features |
-| Prebuilt GDExtension binaries in [GitHub Releases](https://github.com/cyotee/fairplay-crypto-godot/releases) | Mobile store binaries (Milestone A2 later) |
+| Merkle roots / proofs for board-style commit–open (e.g. Battleship) | Real-money gambling features |
+| Prebuilt GDExtension binaries in [GitHub Releases](https://github.com/cyotee/fairplay-crypto-godot/releases) | Mobile store binaries (not shipped yet) |
 
 ## Quick taste (GDScript)
 
@@ -37,7 +37,8 @@ assert(api.verify_commitment(c.commitment_hex, faces, c.nonce_hex))
 4. [Bring-your-own netcode](netcode.md) — what may go on the wire  
 5. [Threat model](threat-model.md) — honest limits of the guarantees  
 
-## Not a gambling product
+## Scope
 
-ManaMesh FairPlay is a **fairness and secret-security toolkit** for multiplayer games.
-It is **not** a gambling product, **not** a cryptocurrency wallet, and **not** boardgame.io for Godot.
+ManaMesh FairPlay is a **fairness toolkit** for competitive multiplayer games: hidden dice, hidden board placement, cooperative deck deal, and related commit–reveal flows.
+
+It is **not** a full game engine, lobby/matchmaking stack, or real-money gambling product — and it is **not** boardgame.io for Godot.
