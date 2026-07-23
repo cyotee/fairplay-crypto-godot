@@ -6,36 +6,18 @@
 
 **Not** a gambling or cryptocurrency product.
 
-## Status
+| | |
+|--|--|
+| **Docs** | [cyotee.github.io/fairplay-crypto-godot](https://cyotee.github.io/fairplay-crypto-godot/) |
+| **Releases** | [GitHub Releases](https://github.com/cyotee/fairplay-crypto-godot/releases) |
+| **Status** | **v0.1 technical preview** — desktop + core tests solid; web preview; mobile not yet |
+| **License** | [MIT](./LICENSE) |
 
-Milestone A core + desktop GDExtension are implemented and tested. HTML5 requires Emscripten (see docs).
+## Quick start (install)
 
-| Doc | Purpose |
-|-----|---------|
-| [PRD.md](./PRD.md) | Product requirements |
-| [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Phased plan |
-| [docs/godot-integration.md](./docs/godot-integration.md) | Install + GDScript usage |
-| [docs/threat-model.md](./docs/threat-model.md) | Commit–reveal honesty |
-| [docs/integration-byo-netcode.md](./docs/integration-byo-netcode.md) | Wire rules |
-
-## Quick start (core tests)
-
-```bash
-cd rust
-cargo test -p manamesh_fairplay_core
-```
-
-## Quick start (Godot)
-
-```bash
-cd rust && cargo build -p manamesh_fairplay_godot --release
-# copy dylib into addons/manamesh_fairplay/bin/ (see godot-integration.md)
-cd ..
-godot --path . --import   # once
-godot --headless --path . --script res://scripts/smoke_desktop.gd
-```
-
-### GDScript commit–reveal (Liar’s Dice–shaped)
+1. Copy `addons/manamesh_fairplay/` into your Godot 4.4+ project (binaries included under `bin/`).
+2. Reload / import the project so the GDExtension registers.
+3. Call the API:
 
 ```gdscript
 var api = ClassDB.instantiate("FairPlayApi")
@@ -45,18 +27,30 @@ var c = api.commit_dice_hand(faces)
 assert(api.verify_commitment(c.commitment_hex, faces, c.nonce_hex))
 ```
 
+Full install guide: [Getting started](https://cyotee.github.io/fairplay-crypto-godot/getting-started/).
+
+## Quick start (core tests)
+
+```bash
+cd rust
+cargo test -p manamesh_fairplay_core
+```
+
 ## Layout
 
-- `rust/manamesh_fairplay_core` — pure crypto (`cargo test`)
-- `rust/manamesh_fairplay_godot` — GDExtension
-- `addons/manamesh_fairplay` — Godot addon
-- `samples/dice_commit_reveal` — offline sample
-- `samples/multiplayer_dice` — networked message pattern (no sk on wire)
+| Path | Role |
+|------|------|
+| `rust/manamesh_fairplay_core` | Pure crypto (`cargo test`) |
+| `rust/manamesh_fairplay_godot` | GDExtension bindings |
+| `addons/manamesh_fairplay` | Godot addon + prebuilt binaries |
+| `samples/dice_commit_reveal` | Offline commit–reveal sample |
+| `samples/multiplayer_dice` | Networked message pattern (no sk on wire) |
+| `docs/` | Source for the documentation site |
 
-## Downstream game
+## Downstream games
 
-A separate **Liar’s Dice** game repo can depend on this addon for multiplayer fairness (Steam/Itch/GOG/mobile/web). This library does not implement that game.
+A separate game (e.g. Liar’s Dice) can depend on this addon for multiplayer fairness. This library does not implement a full game, lobby, or store packaging.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE) and [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

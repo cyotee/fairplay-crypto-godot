@@ -6,3 +6,4 @@ rust/target/
 addons/manamesh_fairplay/bin/*.framework
 # Large local export output (rebuild with build_web.sh + godot --export-release)
 export/
+site/
