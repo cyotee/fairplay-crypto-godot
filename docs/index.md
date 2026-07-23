@@ -16,7 +16,7 @@
 | Commit–reveal for hidden values (Liar’s Dice–shaped) | A full multiplayer game |
 | SRA mental-poker encrypt / peel on secp256k1 | Matchmaking, lobby, or required netcode |
 | Shuffle commit–reveal integrity helpers | Zero-knowledge shuffle proofs (post-preview) |
-| Merkle roots / proofs for board-style commit–open (e.g. Battleship) | Real-money gambling features |
+| Merkle roots / proofs for board-style commit–open (e.g. Battleship) | A full rules engine or game title |
 | Prebuilt GDExtension binaries in [GitHub Releases](https://github.com/cyotee/fairplay-crypto-godot/releases) | Mobile store binaries (not shipped yet) |
 
 ## Quick taste (GDScript)
@@ -39,6 +39,6 @@ assert(api.verify_commitment(c.commitment_hex, faces, c.nonce_hex))
 
 ## Scope
 
-ManaMesh FairPlay is a **fairness toolkit** for competitive multiplayer games: hidden dice, hidden board placement, cooperative deck deal, and related commit–reveal flows.
+ManaMesh FairPlay is a **fairness toolkit** for multiplayer games: hidden dice, hidden board placement, cooperative deck deal, and related commit–reveal flows.
 
-It is **not** a full game engine, lobby/matchmaking stack, or real-money gambling product — and it is **not** boardgame.io for Godot.
+It is a library, not a full game, lobby/matchmaking stack, or boardgame.io port.

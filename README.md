@@ -4,7 +4,7 @@
 
 **Architecture:** Rust cryptography core + **GDExtension** · **GDScript-first** · no .NET required.
 
-Built for **multiplayer game fairness**, not real-money gambling.
+Built for **multiplayer game fairness** — hidden values, board placement, and cooperative deck deal without a trusted dealer.
 
 | | |
 |--|--|
